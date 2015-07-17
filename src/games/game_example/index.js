@@ -6,7 +6,10 @@
 
 	game.registerExpressRoutes = function(expressRouter) {
 		expressRouter.get("/", function(req, res) {
-			res.render("index", config);
+			var data = {
+				"game": game
+			};
+			res.render(__dirname + "/views/index", data);
 		});
 	};
 

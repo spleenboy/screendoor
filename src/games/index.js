@@ -59,12 +59,13 @@ Games.prototype.register = function(game, app) {
 
 	this.validate(game);
 
-	game.baseUrl = path.join('game', game.namespace);
+	game.baseUrl = '/game/' + game.namespace;
 
 	// Express routes
 	var expressRouter = express.Router();
 	expressRouter.use(this.routed.bind(this, game));
 	game.registerExpressRoutes(expressRouter);
+	app.use(game.baseUrl, expressRouter);
 
 	// IO routes
 	var ioRouter = {};
@@ -74,7 +75,7 @@ Games.prototype.register = function(game, app) {
 	}
 
 	this.list[game.namespace] = game;
-	logger.info('Registered game', game.namespace);
+	logger.info('Registered game ' + game.namespace + ' at ' + game.baseUrl);
 };
 
 // Middleware for requests routed to a specific game
