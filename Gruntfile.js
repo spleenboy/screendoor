@@ -30,11 +30,19 @@ module.exports = function(grunt) {
 			}
 		},
 
+		clean: ['src/build/*/'],
+
 		browserify: {
 			dist: {
-				files: {
-					'src/build/dist.js': ['src/client/scripts/**/*.js']
-				}
+				files: [{
+					'src': 'src/static/scripts/**/*.js',
+					'dest': 'src/build/dist.js'
+				}, {
+					'expand': true,
+					'cwd': 'src/games',
+					'src': '*/**/*.js',
+					'dest': 'src/build/js/'
+				}]
 			}
 		},
 
@@ -56,10 +64,11 @@ module.exports = function(grunt) {
 
 	// task loading
 	grunt.loadNpmTasks('grunt-browserify');
+	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-simple-mocha');
 
 	grunt.registerTask('test', ['simplemocha', 'jshint:all']);
-	grunt.registerTask('default', ['test', 'browserify']);
+	grunt.registerTask('default', ['test', 'clean', 'browserify']);
 };
