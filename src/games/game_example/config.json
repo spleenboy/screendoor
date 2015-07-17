@@ -1,0 +1,6 @@
+{
+	"namespace":"whack_a_luke",
+	"display_name":"Be a Client!",
+	"route_public":"public/",
+	"route_node":"index.js"
+}
