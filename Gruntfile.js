@@ -33,10 +33,7 @@ module.exports = function(grunt) {
 		browserify: {
 			dist: {
 				files: {
-					'src/build/dist.js': ['src/client/scripts/**/*.js', 'src/client/scripts/**/*.coffee']
-				},
-				options: {
-					transform: ['coffeeify']
+					'src/build/dist.js': ['src/client/scripts/**/*.js']
 				}
 			}
 		},
@@ -64,5 +61,5 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-simple-mocha');
 
 	grunt.registerTask('test', ['simplemocha', 'jshint:all']);
-	grunt.registerTask('build', ['test', 'browserify']);
+	grunt.registerTask('default', ['test', 'browserify']);
 };
