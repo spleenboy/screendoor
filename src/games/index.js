@@ -1,3 +1,4 @@
+var express = require('express');
 var fs = require('fs');
 var path = require('path');
 var events = require('events');
@@ -52,11 +53,6 @@ Games.prototype.validate = function(game) {
 		logger.error("Game name already in use", game.namespace);
 		throw new Error("That game namespace is already in use");
 	}
-
-	if (!game.expressRouter) {
-		logger.error("Games must include an expressRouter", game.namespace);
-		throw new Error("Missing expressRouter");
-	}
 }
 
 Games.prototype.register = function(game, app) {
@@ -66,12 +62,15 @@ Games.prototype.register = function(game, app) {
 	game.baseUrl = path.join('game', game.namespace);
 
 	// Express routes
-	game.expressRouter.use(this.routed.bind(this, game));
-	app.use(game.baseUrl, game.expressRouter);
+	var expressRouter = express.Router();
+	expressRouter.use(this.routed.bind(this, game));
+	game.registerExpressRoutes(expressRouter);
 
 	// IO routes
-	if (game.ioRouter) {
-		app.io.route(game.baseUrl, game.ioRouter);
+	var ioRouter = {};
+	game.registerIoRoutes(ioRouter);
+	if (ioRouter) {
+		app.io.route(game.baseUrl, ioRouter);
 	}
 
 	this.list[game.namespace] = game;
@@ -80,6 +79,7 @@ Games.prototype.register = function(game, app) {
 
 // Middleware for requests routed to a specific game
 Games.prototype.routed = function(game, req, res, next) {
+	logger.debug("Passing route to game", game.namespace);
 	var data = {
 		"game": game,
 		"req": req,

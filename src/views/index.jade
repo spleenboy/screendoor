@@ -5,4 +5,5 @@ html
 		.container-fluid
 			h1 screendoor
 			each game, name in games
-				.game= game.displayName
+				.game
+					a(href=game.baseUrl)= game.displayName

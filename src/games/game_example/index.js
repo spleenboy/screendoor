@@ -1,27 +1,20 @@
 (function(){
 	var Game = require('./../game');
-	var express = require('express');
-	var app = express();
-
-	app.set('views', './views');
-	app.set('view engine', 'jade');
-
 	var config = require('./config.json');
-	var expressRouter = express.Router();
-
-	expressRouter.get('/', function(req,res,next){
-		res.render('index', config);
-	});
-
-	var ioRouter = {
-		'ping': function(req) {
-			req.socket('emit', 'pong');
-		}
-	};
 
 	var game = new Game(config);
-	game.expressRouter = expressRouter;
-	game.ioRouter = ioRouter;
+
+	game.registerExpressRoutes = function(expressRouter) {
+		expressRouter.get("/", function(req, res) {
+			res.render("index", config);
+		});
+	};
+
+	game.registerIoRoutes = function(ioRouter) {
+		ioRouter.ping = function(req) {
+			req.io.emit('pong');
+		};
+	};
 
 	module.exports = game;
 })();
