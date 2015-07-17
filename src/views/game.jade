@@ -1,10 +1,8 @@
 html
 	head
-		block title
+		link(rel="stylesheet", href="/static/css/game.css")
+		block head
 			title screendoor
 	body
-		.container-fluid
-			block game
-				h1 Game
-
+		block game
 		block scripts

@@ -1,4 +1,4 @@
-var express = require('express');
+var express = require('express.io');
 var logger  = require('../services/logger');
 
 module.exports = function(app) {
@@ -18,6 +18,6 @@ module.exports = function(app) {
 		res.render("index", {"games": games.list});
 	});
 
-	app.use("/static", express.static("client"));
-	app.use("/build",  express.static("build"));
+	app.use("/static", express.static("./src/static"));
+	app.use("/build",  express.static("./src/build"));
 };
