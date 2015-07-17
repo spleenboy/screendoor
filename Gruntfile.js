@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 
 		jshint: {
-			all: ['src/**/*.js', 'test/**/*.js', 'Gruntfile.js'],
+			all: ['src/static/**/*.js', 'test/**/*.js', 'Gruntfile.js'],
 			checkstyle: 'checkstyle.xml',
 			options: {
 				jshintrc: '.jshintrc'
@@ -15,7 +15,7 @@ module.exports = function(grunt) {
 				src: 'Gruntfile.js'
 			},
 			src: {
-				src: ['src/**/*.js']
+				src: ['src/static/**/*.js']
 			},
 			test: {
 				src: ['test/**/*.js']
