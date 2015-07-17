@@ -1,4 +1,5 @@
 var express = require('express');
+var logger  = require('../services/logger');
 
 module.exports = function(app) {
 	app.set('views', './src/views');

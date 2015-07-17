@@ -2,10 +2,12 @@ var fs = require('fs');
 var path = require('path');
 var events = require('events');
 var util = require('util');
+
 var logger = require('../services/logger');
+var Game = require('./game');
 
 function Games() {
-	this.list = [];
+	this.list = {};
 	this.dir  = path.join(process.cwd(), '/src/games/');
 	events.EventEmitter.call(this);
 }
@@ -28,30 +30,52 @@ Games.prototype.load = function(app) {
 			if (path.extname(names[i])) {
 				continue;
 			}
+			var gamePath = './' + names[i];
 			try {
-				var game = require(path.join('.', names[i]));
+				var game = require(gamePath);
 				self.register(game, app);
 			}
 			catch (e) {
-				logger.error("Error registering game", e);
+				logger.error("Error registering game", gamePath, e);
 			}
 		}
+		self.emit('done', self.list);
 	});
 };
 
-Games.prototype.register = function(game, app) {
-	var router = game.getRouter();
-	var name   = game.getName();
-
-	if (name in this.list) {
-		logger.error("Game name already in use", name);
-		throw new Error("That game name is already in use");
+Games.prototype.validate = function(game) {
+	if (!(game instanceof Game)) {
+		throw new TypeError("Invalid game type");
 	}
 
-	router.use(this.routed.bind(this, game));
-	app.use(path.join('game', name), router);
+	if (game.namespace in this.list) {
+		logger.error("Game name already in use", game.namespace);
+		throw new Error("That game namespace is already in use");
+	}
 
-	logger.info('Registered game', name);
+	if (!game.expressRouter) {
+		logger.error("Games must include an expressRouter", game.namespace);
+		throw new Error("Missing expressRouter");
+	}
+}
+
+Games.prototype.register = function(game, app) {
+
+	this.validate(game);
+
+	game.baseUrl = path.join('game', game.namespace);
+
+	// Express routes
+	game.expressRouter.use(this.routed.bind(this, game));
+	app.use(game.baseUrl, game.expressRouter);
+
+	// IO routes
+	if (game.ioRouter) {
+		app.io.route(game.baseUrl, game.ioRouter);
+	}
+
+	this.list[game.namespace] = game;
+	logger.info('Registered game', game.namespace);
 };
 
 // Middleware for requests routed to a specific game
