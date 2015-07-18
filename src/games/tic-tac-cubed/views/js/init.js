@@ -1,0 +1,147 @@
+var THREE = require('three');
+var TWEEN = require('tween');
+var Cube  = require('./cube');
+var Key   = require('./key');
+var Mouse = require('./mouse');
+
+var world = {
+	angle     : 60,
+	near      : 1,
+	far       : 1000,
+	blockSize : 100,
+	width     : window.innerWidth,
+	height    : window.innerHeight
+}
+
+var cube;
+
+var scene, camera, renderer, raycaster;
+
+function init() {
+	scene     = new THREE.Scene();
+	raycaster = new THREE.Raycaster();
+	lights();
+	camera();
+	action();
+}
+
+function lights() {
+	var toplight = new THREE.HemisphereLight(0xffffff, 0x666666);
+	scene.add(toplight);
+
+	var lightbulb = new THREE.PointLight(0xffffff, 1, world.far);
+	lightbulb.position.set(world.width/2, world.height/2, world.near);
+	scene.add(lightbulb);
+}
+
+function camera() {
+	camera = new THREE.PerspectiveCamera(world.angle, world.width / world.height, world.near, world.far);
+	camera.position.z = world.far/2;
+}
+
+function action() {
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize(world.width, world.height);
+	document.body.appendChild(renderer.domElement);
+	setup();
+	loop();
+}
+
+function setup() {
+	cube = new Cube(world.blockSize);
+	cube.generate(scene);
+}
+
+function draw() {
+	if (Key.isDown(Key.SPACEBAR)) {
+		if (Key.isDown(Key.SHIFT)) {
+			camera.position.z += 10;
+		}
+		else {
+			camera.position.z -= 10;
+		}
+	}
+}
+
+function loop() {
+	requestAnimationFrame(loop);
+	draw();
+	TWEEN.update();
+	renderer.render(scene, camera);
+}
+
+function turn(object, axis, direction) {
+	var radian   = Math.PI/2;
+	var current  = object.rotation[axis];
+	var rotation = current + (direction * radian);
+
+	// Used to force-fit into right angles
+	var index    = Math.round(rotation / radian);
+	var target   = index * radian;
+
+	var tween = new TWEEN.Tween({angle: object.rotation[axis]});
+	tween.to({angle: target})
+		.easing(TWEEN.Easing.Elastic.Out)
+		.onUpdate(function() {
+			object.rotation[axis] = this.angle;
+		})
+		.start();
+}
+
+var horizontal = 'y';
+var vertical   = 'x';
+
+Key.on('up', function(event) {
+	if (event.UP_ARROW) {
+		turn(cube, vertical, 1);
+		horizontal = horizontal === 'y' ? 'z' : 'y';
+	}
+	if (event.DOWN_ARROW) {
+		turn(cube, vertical, -1);
+		horizontal = horizontal === 'y' ? 'z' : 'y';
+	}
+	if (event.RIGHT_ARROW) {
+		turn(cube, horizontal, 1);
+	}
+	if (event.LEFT_ARROW) {
+		turn(cube, horizontal, -1);
+	}
+});
+
+Mouse.on('up', function(event) {
+	var mouse = {
+		x: ((event.up.x/world.width) * 2) - 1,
+		y: -((event.up.y/world.height) * 2) + 1
+	};
+
+	raycaster.setFromCamera(mouse, camera);
+
+	var intersected = raycaster.intersectObjects(cube.blocks);
+
+	if (!intersected || !intersected.length) {
+		return;
+	}
+
+	var direction = mouse.x > 0 ? 1 : -1;
+	turn(intersected[0].object, 'y', direction);
+
+	var grids = cube.grids();
+	var table = [];
+	grids.forEach(function(grid, i) {
+		table.push([]);
+		grid.forEach(function(b, y) {
+			table[i][y] = b.showing.join(',');
+		});
+	});
+	console.table(table);
+});
+
+window.addEventListener('resize', function() {
+	world.width = window.innerWidth;
+	world.height = window.innerHeight;
+	camera.aspect = world.width / world.height;
+	camera.updateProjectionMatrix();
+	renderer.setSize(world.width, world.height);
+});
+
+init();

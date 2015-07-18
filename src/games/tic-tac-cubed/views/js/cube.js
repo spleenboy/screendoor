@@ -1,3 +1,6 @@
+var THREE = require('three');
+var Block = require('./block');
+
 function Cube(blockSize) {
 	this.blockSize = blockSize || 1;
 	this.blocks = [];
@@ -77,3 +80,5 @@ Cube.prototype.showing = function(origin) {
 
 	return blocks;
 };
+
+module.exports = Cube;
