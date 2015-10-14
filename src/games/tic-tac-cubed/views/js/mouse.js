@@ -134,3 +134,5 @@ var Mouse = new MouseWatcher();
 Mouse.LEFT   = 1;
 Mouse.MIDDLE = 2;
 Mouse.RIGHT  = 3;
+
+module.exports = Mouse;

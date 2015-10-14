@@ -210,3 +210,5 @@ for (var code in Key.Codes) {
 	var name = Key.Codes[code];
 	Key[Key.toVariable(name)] = code;
 }
+
+module.exports = Key;

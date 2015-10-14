@@ -1,3 +1,5 @@
+var THREE = require('three');
+
 function Block(size) {
 	this.size     = size || 100;
 	this.index    = 0;
@@ -83,3 +85,5 @@ Block.prototype.showing = function(origin) {
 	});
 	return indices;
 };
+
+module.exports = Block;
