@@ -3,10 +3,10 @@
 Interactive data visualizations
 
 ## Getting Started
-Install screendoor with: `npm install -g screendoor` or clone repo [https://github.com/barrett/screendoor](https://github.com/barrett/screendoor).
+Install screendoor with: `npm install -g screendoor` or clone repo [https://github.com/spleenboy/screendoor](https://github.com/spleenboy/screendoor).
 
 ```bash
-$ git clone https://github.com/barrett/screendoor
+$ git clone https://github.com/spleenboy/screendoor
 $ cd screendoor
 $ npm install
 ```
